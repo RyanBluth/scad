@@ -213,8 +213,14 @@ module raisedFloor() {
       }
     }
 
-    translate([100, 25, 0 ]) {
-      rotate([ 0, 0, 90 ]) { circutBoardPosts(); }
+    translate([ 100, 15, 0 ]) {
+      rotate([ 0, 0, 90 ]) { circuitBoardPosts(); }
+    }
+
+    translate([ 63, 27, 0 ]) {
+      rotate([ 0, 0, 90 ]) {
+        batteryHolderPosts();
+      }
     }
   }
 }
@@ -291,7 +297,7 @@ module xlrJack(screwHoles = true) {
   }
 }
 
-module circutBoard() {
+module circuitBoard() {
   difference() {
     cube([ 70, 30, 1.5 ]);
 
@@ -303,13 +309,40 @@ module circutBoard() {
   }
 }
 
-module circutBoardPosts() {
-  post_radius = 3;
-  for (x = [ 1.5 - post_radius, 70 - 1.5 - post_radius ]) {
-    for (y = [ 1.5 - post_radius, 30 - 1.5 - post_radius ]) {
-      translate([ x, y, 0 ]) {
-        screwPost(height = 10, radius = post_radius, holeHeight = 4, holeRadius = 0.5);
+module circuitBoardPosts() {
+  color([ 0.3, 0.4, 0.5 ]) {
+    postRadius = 3;
+    for (x = [ 1.5 - postRadius, 70 - 1.5 - postRadius ]) {
+      for (y = [ 1.5 - postRadius, 30 - 1.5 - postRadius ]) {
+        translate([ x, y, 0 ]) {
+          screwPost(height = 10, radius = postRadius, holeHeight = 4,
+                    holeRadius = 0.5);
+        }
       }
+    }
+  }
+}
+
+module batteryHolder() {
+  cube([ 48, 52, 12 ]);
+
+  translate([ 18, 26, 0 ]) { cylinder(h = 20, r = 1); }
+
+  translate([ 48 - 18, 26, 0 ]) { cylinder(h = 20, r = 1); }
+}
+
+module batteryHolderPosts() {
+  color([ 0.7, 0.6, 0.4 ]) {
+    postRadius = 3;
+
+    translate([ 18 - postRadius, 26 - postRadius, 0 ]) {
+      screwPost(height = 10, radius = postRadius, holeHeight = 4,
+                holeRadius = 0.5);
+    }
+
+    translate([ 48 - 18 - postRadius, 26 - postRadius, 0 ]) {
+      screwPost(height = 10, radius = postRadius, holeHeight = 4,
+                holeRadius = 0.5);
     }
   }
 }
@@ -325,7 +358,7 @@ displayZInset = 0.3;
 displayYInset = 3;
 
 boxWidth = 120;
-boxDepth = 150;
+boxDepth = 130;
 boxHeight = 60;
 boxThreadedInsertRadius = 5.3 / 2;
 wallThickness = 3;
@@ -448,4 +481,8 @@ difference() {
   translate([ boxWidth / 2 - xlrJackWidth / 2, boxDepth, 20 ]) { xlrJack(); }
 }
 
-translate([ -100, 0, 0 ]) { circutBoard(); }
+translate([ -100, 0, 0 ]) { circuitBoard(); }
+
+translate([ -200, 0, 0 ]) { batteryHolderPosts(); }
+
+translate([ -200, 0, 0 ]) { batteryHolder(); }
