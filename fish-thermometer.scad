@@ -1,4 +1,4 @@
-$fn = 20;
+$fn = 200;
 
 module roundedBox(width, depth, height, wallThickness = 0.75) {
   /*
@@ -43,12 +43,18 @@ module roundedBox(width, depth, height, wallThickness = 0.75) {
   }
 }
 
-module screwPost(height, radius, holeHeight, holeRadius) {
+module screwPost(height, radius, holeHeight, holeRadius, debugScrews=false) {
   translate([ radius, radius, 0 ]) {
     difference() {
       cylinder(height, r = radius);
       translate([ 0, 0, height - holeHeight ]) {
         cylinder(holeHeight, r = holeRadius);
+      }
+    }
+
+    if(debugScrews) {
+      translate([ 0, 0, height - holeHeight ]) {
+        cylinder(100, r = holeRadius);
       }
     }
   }
@@ -57,7 +63,7 @@ module screwPost(height, radius, holeHeight, holeRadius) {
 module projectBox(width, depth, height, wallThickness = 0.75,
                   threadedInsertRadius = 0.6, threadedInsertHeight = 2,
                   lidInsetThickness = 0.5, lidInsetDepth = 3,
-                  screwHoleRadius = 0.3, screwPostRadius = 1.2) {
+                  screwHoleRadius = 0.3, screwPostRadius = 1.5) {
   threeQuarterWallThickness = wallThickness * 0.75;
 
   union() {
@@ -198,7 +204,7 @@ module raisedFloor() {
       translate([ 0, 0, -20 ]) {
         projectBox(boxWidth, boxDepth, boxHeight, threadedInsertHeight = 4,
                    threadedInsertRadius = boxThreadedInsertRadius,
-                   screwPostRadius = 5, lidInsetDepth = lidInset,
+                   screwPostRadius = 5.5, lidInsetDepth = lidInset,
                    wallThickness = wallThickness);
       }
 
@@ -211,16 +217,17 @@ module raisedFloor() {
           translate([ x, y, 0 ]) { cylinder(h = 10, r = 0.5); }
         }
       }
+
+      translate([ 60, 30, 0 ]) {
+        rotate([ 0, 0, 90 ]) { batteryHolderPostsHoles(); }
+      }
     }
 
     translate([ 100, 15, 0 ]) {
       rotate([ 0, 0, 90 ]) { circuitBoardPosts(); }
     }
-
     translate([ 63, 27, 0 ]) {
-      rotate([ 0, 0, 90 ]) {
-        batteryHolderPosts();
-      }
+      rotate([ 0, 0, 90 ]) { batteryHolderPosts(); }
     }
   }
 }
@@ -316,7 +323,7 @@ module circuitBoardPosts() {
       for (y = [ 1.5 - postRadius, 30 - 1.5 - postRadius ]) {
         translate([ x, y, 0 ]) {
           screwPost(height = 10, radius = postRadius, holeHeight = 4,
-                    holeRadius = 0.5);
+                    holeRadius = 0.8);
         }
       }
     }
@@ -336,14 +343,35 @@ module batteryHolderPosts() {
     postRadius = 3;
 
     translate([ 18 - postRadius, 26 - postRadius, 0 ]) {
-      screwPost(height = 10, radius = postRadius, holeHeight = 4,
-                holeRadius = 0.5);
+      screwPost(height = wallThickness + 0.8, radius = postRadius,
+                holeHeight = 4, holeRadius = 0.8);
     }
 
     translate([ 48 - 18 - postRadius, 26 - postRadius, 0 ]) {
-      screwPost(height = 10, radius = postRadius, holeHeight = 4,
-                holeRadius = 0.5);
+      screwPost(height = wallThickness + 0.8, radius = postRadius,
+                holeHeight = 4, holeRadius = 0.8);
     }
+  }
+}
+
+module batteryHolderPostsHoles() {
+  color([ 0.7, 0.6, 0.4 ]) {
+    postRadius = 3;
+
+    translate([ 18 - postRadius, 26 - postRadius, 0 ]) {
+      cylinder(h = 10, r = 0.5);
+    }
+
+    translate([ 48 - 18 - postRadius, 26 - postRadius, 0 ]) {
+      cylinder(h = 10, r = 0.5);
+    }
+  }
+}
+
+module switchCutout() {
+  rotate([ 90, 0, 0 ]) union() {
+    cylinder(h = wallThickness * 0.5, r = 6.5);
+    cylinder(h = 10, r = 3.18);
   }
 }
 
@@ -360,23 +388,24 @@ displayYInset = 3;
 boxWidth = 120;
 boxDepth = 130;
 boxHeight = 60;
-boxThreadedInsertRadius = 5.3 / 2;
+boxThreadedInsertRadius = 5.15 / 2;
 wallThickness = 3;
 
 lidHeight = 6;
 lidInset = 6;
 lidScrewHoleRadius = 1.6;
 
-screwHoleRadius = 0.5;
+screwHoleRadius = 0.8;
 
 raisedFloorScrewPostHeight = 20;
 
 box = true;
-lid = true;
+lid = false;
 raisedFloor = true;
 raisedFloorInReferencePosition = true;
 lidInReferencePosition = false;
-referenceDisplay = true;
+referenceDisplay = false;
+gasketLip = false;
 difference() {
   union() {
     if (lid) {
@@ -386,7 +415,7 @@ difference() {
             color(alpha = 0.5) {
               projectBoxLid(
                   boxWidth, boxDepth, lidHeight, lidInsetDepth = lidInset,
-                  screwPostRadius = 4, screwHoleRadius = lidScrewHoleRadius,
+                  screwPostRadius = 5, screwHoleRadius = lidScrewHoleRadius,
                   wallThickness = wallThickness, lidInsetThickness = 2,
                   screwHeadInsetDepth = 1.5, screwHeadInsetRadius = 2.5);
             }
@@ -394,7 +423,7 @@ difference() {
         }
       } else {
         projectBoxLid(boxWidth, boxDepth, lidHeight, lidInsetDepth = lidInset,
-                      screwPostRadius = 4, screwHoleRadius = lidScrewHoleRadius,
+                      screwPostRadius = 5, screwHoleRadius = lidScrewHoleRadius,
                       wallThickness = wallThickness, lidInsetThickness = 2,
                       screwHeadInsetDepth = 1.5, screwHeadInsetRadius = 2.5);
       }
@@ -415,7 +444,7 @@ difference() {
     if (box) {
       projectBox(boxWidth, boxDepth, boxHeight, threadedInsertHeight = 4,
                  threadedInsertRadius = boxThreadedInsertRadius,
-                 screwPostRadius = 4, lidInsetDepth = lidInset,
+                 screwPostRadius = 5, lidInsetDepth = lidInset,
                  wallThickness = wallThickness);
 
       if (referenceDisplay) {
@@ -432,30 +461,32 @@ difference() {
 
       displaySupport();
 
-      // Gasket lip
-      color([ 0, 0.7, 0 ]) {
-        difference() {
-          translate(
-              [ wallThickness, wallThickness, boxHeight - lidInset - 1 ]) {
-            difference() {
-              cube([
-                boxWidth - wallThickness * 2, boxDepth - wallThickness * 2,
-                wallThickness
-              ]);
+      if (gasketLip) {
+        // Gasket lip
+        color([ 0, 0.7, 0 ]) {
+          difference() {
+            translate(
+                [ wallThickness, wallThickness, boxHeight - lidInset - 1 ]) {
               difference() {
-                translate([ wallThickness, wallThickness, -0.1 ]) {
-                  cube([
-                    boxWidth - wallThickness * 4, boxDepth - wallThickness * 4,
-                    wallThickness * 2
-                  ]);
+                cube([
+                  boxWidth - wallThickness * 2, boxDepth - wallThickness * 2,
+                  wallThickness
+                ]);
+                difference() {
+                  translate([ wallThickness, wallThickness, -0.1 ]) {
+                    cube([
+                      boxWidth - wallThickness * 4,
+                      boxDepth - wallThickness * 4, wallThickness * 2
+                    ]);
+                  }
                 }
               }
             }
-          }
-          for (x = [ wallThickness * 2, boxWidth - wallThickness * 2 ]) {
-            for (y = [ wallThickness * 2, boxDepth - wallThickness * 2 ]) {
-              translate([ x, y, -0.1 ]) {
-                cylinder(h = 100, r = boxThreadedInsertRadius);
+            for (x = [ wallThickness * 2, boxWidth - wallThickness * 2 ]) {
+              for (y = [ wallThickness * 2, boxDepth - wallThickness * 2 ]) {
+                translate([ x, y, -0.1 ]) {
+                  cylinder(h = 100, r = boxThreadedInsertRadius);
+                }
               }
             }
           }
@@ -463,11 +494,11 @@ difference() {
       }
 
       // Raised floor screw posts
-      for (x = [ 10 + wallThickness, boxWidth - 10 - wallThickness - 4 ]) {
-        for (y = [ 20, boxDepth - 50 ]) {
+      for (x = [ 7 + wallThickness, boxWidth - 13 - wallThickness - 4 ]) {
+        for (y = [ 17, boxDepth - 55 ]) {
           translate([ x, y, wallThickness ]) {
-            screwPost(height = raisedFloorScrewPostHeight, radius = 2,
-                      holeHeight = 4, holeRadius = 0.5);
+            screwPost(height = raisedFloorScrewPostHeight, radius = 5,
+                      holeHeight = 4, holeRadius = 0.8);
           }
         }
       }
@@ -479,10 +510,8 @@ difference() {
   }
 
   translate([ boxWidth / 2 - xlrJackWidth / 2, boxDepth, 20 ]) { xlrJack(); }
+
+  // translate([ 16, boxDepth, boxHeight / 2 + 10 ]) { switchCutout(); }
 }
 
-translate([ -100, 0, 0 ]) { circuitBoard(); }
-
-translate([ -200, 0, 0 ]) { batteryHolderPosts(); }
-
-translate([ -200, 0, 0 ]) { batteryHolder(); }
+// translate([ -100, 0, 0 ]) { switchCutout(); }
